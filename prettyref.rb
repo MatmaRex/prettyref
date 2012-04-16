@@ -226,10 +226,10 @@ def magical_ref_cleaning text
 		end
 		
 	end
-
+	
 	# add the shorttags
 	shorttags = text.scan(/(#{Ref::REF_SHORTTAG})/).map{|ary| Ref.new ary.first, true}
-	shorttags.map!{|r| r.name = refs.find{|r2| r2.name == r.name}.name } # find the new names
+	shorttags.each{|r| r.name = refs.find{|r2| r2.orig_name == r.orig_name}.name } # find the new names
 	refs += shorttags
 
 
@@ -245,7 +245,11 @@ def magical_ref_cleaning text
 	przypisy_re = /(=+ *Przypisy *=+\s+)?\{\{Przypisy[^}]*\}\}/i
 
 	if text =~ przypisy_re
-		data = (['== Przypisy ==', '{{Przypisy-lista|'] + refs + ['}}']).join("\n")
+		data = (
+			['== Przypisy ==', '{{Przypisy-lista|'] +
+			refs.select{|r| r.content} + # skip shorttags
+			['}}']
+		).join("\n")
 		
 		text = text.sub(przypisy_re, data)
 	else
