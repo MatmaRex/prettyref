@@ -185,15 +185,19 @@ class Ref
 	end
 	
 	def to_s
-		fmt = '<ref name="%s">%s</ref>'
-		
-		if @content.start_with? '{{'
-			cont = Template.new(@content).to_s
+		if @content
+			fmt = '<ref name="%s">%s</ref>'
+			
+			if @content.start_with? '{{'
+				cont = Template.new(@content.dup).to_s
+			else
+				cont = @content
+			end
+			
+			fmt % [@name, cont]
 		else
-			cont = @content
+			'<ref name="%s" />' % @name
 		end
-		
-		fmt % [@name, cont]
 	end
 end
 
