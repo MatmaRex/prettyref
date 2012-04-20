@@ -78,7 +78,7 @@ class Ref
 			
 			@content = str.strip
 			
-			if !@name || @name=='test' || @name =~ /^autonazwa\d+$/
+			if !@name || @name=='test' || @name =~ /^auto(nazwa)?\d+$/
 				@name = extract_name @content.dup
 			end
 		else
@@ -124,25 +124,29 @@ class Ref
 			# jeśli mamy szablon, to super
 			tpl = Template.new str
 			
-			if a = tpl[:pmid]
-				ident = "pmid#{a}"
-			elsif a = tpl[:doi]
-				ident = "doi#{a}"
-			elsif a = tpl[:url]
-				ident = extract_name_from_uri a
-			elsif a = tpl[:autor]
-				ident = extract_name_from_words clear_wikitext a
-			elsif tpl[:nazwisko] && tpl[:imię]
-				ident = extract_name_from_words clear_wikitext "#{tpl[:nazwisko]}  #{tpl[:imię]}"
-				# TODO: jest więcej parametrów z nazwiskami...
-				# TODO: warto dodać rok?
-			elsif a = tpl[:tytuł]
-				ident = extract_name_from_words clear_wikitext a
+			case tpl.name
+			when 'Cytuj grę komputerową', 'Cytuj książkę', 'Cytuj odcinek', 'Cytuj pismo', 'Cytuj stronę'
+				if a = tpl[:pmid]
+					ident = "pmid#{a}"
+				elsif a = tpl[:doi]
+					ident = "doi#{a}"
+				elsif a = tpl[:url]
+					ident = extract_name_from_uri a
+				elsif a = tpl[:autor]
+					ident = extract_name_from_words clear_wikitext a
+				elsif tpl[:nazwisko] && tpl[:imię]
+					ident = extract_name_from_words clear_wikitext "#{tpl[:nazwisko]}  #{tpl[:imię]}"
+					# TODO: jest więcej parametrów z nazwiskami...
+					# TODO: warto dodać rok?
+				elsif a = tpl[:tytuł]
+					ident = extract_name_from_words clear_wikitext a
+				else
+					# nic sie nie dopasowalo? dziwne...
+					ident = extract_name_from_words clear_wikitext tpl.values.join(" ")
+				end
 			else
-				# nic sie nie dopasowalo? dziwne...
-				ident = extract_name_from_words clear_wikitext tpl.values.join(" ")
+				raise "unsupported cite template #{tpl.name}"
 			end
-			
 		else
 			# a jeśli nie, to pozostaje nam URL albo cokolwiek z treści
 			uris = URI.extract str, %w[http https ftp]
