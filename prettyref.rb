@@ -4,6 +4,11 @@ require 'unicode_utils'
 
 # Represents a Wikipedia template. (Simplified parsing, beware.)
 class Template < Hash
+	CANONICAL_CAPITALISATION = {
+		lowercase: ['Cytuj grę komputerową', 'Cytuj książkę', 'Cytuj odcinek', 'Cytuj pismo', 'Cytuj stronę'],
+		uppercase: ['GoldBook'],
+	}
+	
 	attr_accessor :name
 	def initialize str
 		super()
@@ -19,7 +24,7 @@ class Template < Hash
 	
 	def parse text
 		text.strip!
-		text.sub!(/\A{{\s*([^\|]+)/){ @name = $1.strip; @name[0] = @name[0].downcase; '' }
+		text.sub!(/\A{{\s*([^\|]+)/){ @name = $1.strip; @name[0] = @name[0].upcase; '' }
 		text.sub!(/\}\}\Z/, '')
 		
 		# escape pipes in inner templates and links
@@ -40,7 +45,10 @@ class Template < Hash
 	
 	def to_s
 		data = []
-		data << "{{#{@name}"
+		name = @name.dup
+		# by default names are stored uppercased
+		name[0] = name[0].downcase if CANONICAL_CAPITALISATION[:lowercase].include? name
+		data << "{{#{name}"
 		
 		data += self.map{|param, value| " | #{param} = #{value}" }
 		
