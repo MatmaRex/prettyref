@@ -172,9 +172,9 @@ class Ref
 				title = tpl[:tytuł] # nie używamy tytułu części czy tomu
 				pages = tpl[:strony]
 				
-				author = extract_name_from_words clear_wikitext author
-				title  = extract_name_from_words clear_wikitext title
-				pages  = pages.gsub(/[-–—]/, '-').gsub(/[^\d-]/, '')
+				author = extract_name_from_words clear_wikitext author if author
+				title  = extract_name_from_words clear_wikitext title  if title
+				pages  = pages.gsub(/[-–—]/, '-').gsub(/[^\d-]/, '')   if pages
 			
 				if a = tpl[:pmid]
 					ident = "pmid#{a}"
