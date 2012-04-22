@@ -354,11 +354,17 @@ def magical_ref_cleaning text
 	return text
 end
 
-
-
 require 'sunflower'
 s = Sunflower.new.login
+#s.summary = ''
 
-p = Page.new ARGV[0]
-p.text = magical_ref_cleaning p.text
-p.dump
+list = readlines()
+
+
+list.split(/\r?\n/).map{|a| a.strip}.each do |t|
+	next unless t and t!=''
+
+	p = Page.new t
+	p.text = magical_ref_cleaning p.text
+	p.dump
+end
