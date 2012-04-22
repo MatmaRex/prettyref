@@ -301,7 +301,8 @@ def magical_ref_cleaning text
 	if text =~ przypisy_re
 		data = (
 			['== Przypisy ==', '{{Przypisy-lista|'] +
-			refs.select{|r| r.content} + # skip shorttags
+			# skip shorttags
+			refs.select{|r| r.content}.sort_by{|r| UnicodeUtils.casefold r.name} +
 			['}}']
 		).join("\n")
 		
