@@ -67,6 +67,8 @@ class Ref
 	REF_CLOSE_RE = /< *\/ *ref *>/
 	# Matches self-closing ref tag (shorttag).
 	REF_SHORTTAG = /< *ref((?: *#{ATTR_RE})*) *\/ *>/
+	# Matches {{r}} template.
+	REF_RETAG = /\{\{\s*[rR]\s*((?:\|[^\|\}]*)+)\}\}/
 	
 	attr_accessor :orig, :name, :orig_name, :group, :content
 	def initialize str, shorttag=false
@@ -82,12 +84,27 @@ class Ref
 				@name = extract_name @content.dup
 			end
 		else
-			str.sub!(REF_SHORTTAG){ parse_attrs $1; '' }
 			@content = nil
+			
+			if str =~ REF_SHORTTAG
+				str.sub!(REF_SHORTTAG){ parse_attrs $1; '' }
+			elsif str =~ REF_RETAG
+				data = str[REF_RETAG, 1].split(/\s*\|\s*/).map(&:strip).select{|a| a and a!=''}
+				if data.any?{|a| a.include? '='}
+					raise '{{r}} tags with named attributes unsupported'
+				end
+				if data.length != 1
+					raise 'this shouldnt happen'
+				end
+				
+				@name = data[0]
+				@orig_name = @name.dup
+			end
+			
 			if !@name
 				raise 'shorttag and no name'
 			else
-				if @name=='test' || @name =~ /^autonazwa\d+$/
+				if @name=='test' || @name =~ /^auto(nazwa)?\d+$/
 					@name = false # this means that the name will be determined later by scanning all other ref tags
 				end
 			end
@@ -244,13 +261,17 @@ def magical_ref_cleaning text
 	end
 	
 	# add the shorttags
+	text.gsub!(Ref::REF_RETAG){ $&.gsub('|', '}}{{r|').gsub('{{r}}', '') } # HACK make multi-{{r}} sort-of work
+	
 	shorttags = text.scan(/(#{Ref::REF_SHORTTAG})/).map{|ary| Ref.new ary.first, true}
+	shorttags += text.scan(/(#{Ref::REF_RETAG})/).map{|ary| Ref.new ary.first, true}
 	shorttags.each{|r| r.name = refs.find{|r2| r2.orig_name == r.orig_name}.name } # find the new names
 	refs += shorttags
 
 
 
 	# replace refs in text with {{r}} calls
+	# this might also change the inside of references section - will deal with it later
 	refs.each do |r|
 		text.sub!(r.orig, "{{r|#{r.name}}}")
 	end
@@ -258,7 +279,7 @@ def magical_ref_cleaning text
 
 
 	# place refs in the section
-	przypisy_re = /(=+ *Przypisy *=+\s+)?\{\{Przypisy[^}]*\}\}/i
+	przypisy_re = /(=+ *Przypisy *=+\s+)?(<references\s*\/>|\{\{Przypisy([^{}]*|\{\{[^{}]+\}\})+\}\}|<references\s*>(.+?)<\/references\s*>)/i
 
 	if text =~ przypisy_re
 		data = (
