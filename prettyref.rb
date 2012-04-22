@@ -70,6 +70,9 @@ class Ref
 	# Matches {{r}} template.
 	REF_RETAG = /\{\{\s*[rR]\s*((?:\|[^\|\}]*)+)\}\}/
 	
+	# Optimal length for ref name. Does not apply in some cases.
+	IDENT_MAX_LEN = 25
+	
 	attr_accessor :orig, :name, :orig_name, :group, :content
 	def initialize str, shorttag=false
 		@orig = str.dup
@@ -129,7 +132,7 @@ class Ref
 	end
 	
 	def extract_name str
-		# Na kilka sposobów możemy wymyślić nazwę dla refa. Nie powinna ona przekraczać 30 znaków. 
+		# Na kilka sposobów możemy wymyślić nazwę dla refa. Nie powinna ona przekraczać 25 (IDENT_MAX_LEN) znaków. 
 		# W kolejności używamy do tego:
 		# 1. PMID/DOI
 		# 2. Adresu URL
@@ -199,7 +202,7 @@ class Ref
 		
 		ident = ([host.gsub('.', '-')] + words).join('-')
 		
-		while ident.length > 30 && !words.empty?
+		while ident.length > IDENT_MAX_LEN && !words.empty?
 			words.shift
 			ident = ([host] + words).join('-')
 		end
@@ -209,7 +212,7 @@ class Ref
 	
 	def extract_name_from_words str
 		words = (UnicodeUtils.nfc str).scan(/(?:\p{L}|\p{M}|\p{N})+/)
-		ident = words.inject(''){|id, w| id.length<30 ? (id<<' '<<w) : id }
+		ident = words.inject(''){|id, w| id.length<IDENT_MAX_LEN ? (id<<' '<<w) : id }
 		ident
 	end
 	
