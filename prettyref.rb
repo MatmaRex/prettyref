@@ -331,8 +331,16 @@ def magical_ref_cleaning text
 	przypisy_re = /(=+ *Przypisy *=+\s+)?(<references\s*\/>|\{\{Przypisy([^{}]*|\{\{[^{}]+\}\})+\}\}|<references\s*>(.+?)<\/references\s*>)/i
 
 	if text =~ przypisy_re
+		old_ref_section = $&
+		level = '=='
+		if mtc = old_ref_section.match(/\A==+/)
+			level = mtc.to_s
+		elsif mtc = old_ref_section.match(/stopień\s*=\s*(==+)/)
+			level = mtc[1]
+		end
+		
 		data = (
-			['== Przypisy ==', '{{Przypisy-lista|'] +
+			["#{level} Przypisy #{level}", '{{Przypisy-lista|'] +
 			# skip shorttags
 			refs.select{|r| r.content}.sort_by{|r| UnicodeUtils.casefold r.name} +
 			['}}']
