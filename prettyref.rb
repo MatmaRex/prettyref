@@ -132,13 +132,23 @@ class Ref
 	end
 	
 	def extract_name str
-		# Na kilka sposobów możemy wymyślić nazwę dla refa. Nie powinna ona przekraczać 25 (IDENT_MAX_LEN) znaków. 
+		# Nazwę dla refa możemy wymyślić na kilka sposobów. Nie powinna ona przekraczać 25 (IDENT_MAX_LEN) znaków. 
 		# W kolejności używamy do tego:
-		# 1. PMID/DOI
-		# 2. Adresu URL
-		# 3. Nazwiska i imienia autora
-		# 4. Tytułu dzieła
-		# 5. Początkowych słów występujących w refie
+		# 
+		# a) Jeśli ref zawiera jeden ze standardowych szablonów {{cytuj:
+		#    1. PMID/DOI
+		#    2. Nazwiska autora + roku
+		#    3. Tytułu dzieła
+		#    4. Adresu URL
+		#    5. Samego nazwiska autora
+		#    (+ stron, jeśli podano)
+		# b) Jeśli ref zawiera jeden z szablonów szczegółowych:
+		#    (nie zaimplementowane...)
+		# c) Jeśli ref jest zwykłym tekstem:
+		#    1. Adresu URL obecnego w tekście
+		# 
+		# Jeśli nie uda się utworzyć identyfikatora na żaden z powyższych sposobów, powstaje on z początkowych słów 
+		# występujących w tekście refa.
 		
 		if str.start_with? '{{'
 			# jeśli mamy szablon, to super
@@ -146,21 +156,43 @@ class Ref
 			
 			case tpl.name
 			when 'Cytuj grę komputerową', 'Cytuj książkę', 'Cytuj odcinek', 'Cytuj pismo', 'Cytuj stronę'
+				# extract some terms used later
+				year = (
+					tpl[:rok] ? tpl[:rok] :
+					tpl[:data] ? tpl[:data][/\d{3,4}/] :
+					nil
+				)
+				author = (
+					tpl[:'nazwisko r'] ? tpl[:'nazwisko r'] :
+					tpl[:'autor r'] ? tpl[:'autor r'] :
+					tpl[:nazwisko] ? tpl[:nazwisko] :
+					tpl[:autor] ? tpl[:autor] :
+					nil
+				)
+				title = tpl[:tytuł] # nie używamy tytułu części czy tomu
+				pages = tpl[:strony]
+				
+				author = extract_name_from_words clear_wikitext author
+				title  = extract_name_from_words clear_wikitext title
+				pages  = pages.gsub(/[-–—]/, '-').gsub(/[^\d-]/, '')
+			
 				if a = tpl[:pmid]
 					ident = "pmid#{a}"
 				elsif a = tpl[:doi]
 					ident = "doi#{a}"
+				elsif author and year
+					ident = author+year
+				elsif title
+					ident = title
 				elsif a = tpl[:url]
 					ident = extract_name_from_uri a
-				elsif a = tpl[:autor]
-					ident = extract_name_from_words clear_wikitext a
-				elsif tpl[:nazwisko] && tpl[:imię]
-					ident = extract_name_from_words clear_wikitext "#{tpl[:nazwisko]}  #{tpl[:imię]}"
-					# TODO: jest więcej parametrów z nazwiskami...
-					# TODO: warto dodać rok?
-				elsif a = tpl[:tytuł]
-					ident = extract_name_from_words clear_wikitext a
-				else
+				elsif author
+					ident = author
+				end
+				
+				ident += "-s#{pages}" if ident and pages
+				
+				if !ident
 					# nic sie nie dopasowalo? dziwne...
 					ident = extract_name_from_words clear_wikitext tpl.values.join(" ")
 				end
