@@ -263,6 +263,21 @@ def magical_ref_cleaning text
 		
 	end
 	
+	# check for dupes
+	refs.each_with_index do |ri, i|
+		refs.each_with_index do |rj, j|
+			next if i == j
+			# compare only contents
+			if ri.to_s.sub('"'+ri.name+'"', '') == rj.to_s.sub('"'+rj.name+'"', '')
+				puts 'dupe found!'
+				
+				# convert the other to shorttag; this anso ensures it's not matched as a dupe again
+				rj.content = nil
+				rj.name = ri.name
+			end
+		end
+	end
+	
 	# add the shorttags
 	text.gsub!(Ref::REF_RETAG){ $&.gsub('|', '}}{{r|').gsub('{{r}}', '') } # HACK make multi-{{r}} sort-of work
 	
@@ -270,7 +285,6 @@ def magical_ref_cleaning text
 	shorttags += text.scan(/(#{Ref::REF_RETAG})/).map{|ary| Ref.new ary.first, true}
 	shorttags.each{|r| r.name = refs.find{|r2| r2.orig_name == r.orig_name}.name } # find the new names
 	refs += shorttags
-
 
 
 	# replace refs in text with {{r}} calls
