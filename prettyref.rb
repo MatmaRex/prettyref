@@ -361,7 +361,7 @@ s = Sunflower.new.login
 list = readlines()
 
 
-list.split(/\r?\n/).map{|a| a.strip}.each do |t|
+list.map{|a| a.strip}.each do |t|
 	next unless t and t!=''
 
 	p = Page.new t
