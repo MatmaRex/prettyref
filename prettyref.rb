@@ -316,7 +316,11 @@ def magical_ref_cleaning text
 	
 	shorttags = text.scan(/(#{Ref::REF_SHORTTAG})/).map{|ary| Ref.new ary.first, true}
 	shorttags += text.scan(/(#{Ref::REF_RETAG})/).map{|ary| Ref.new ary.first, true}
-	shorttags.each{|r| r.name = refs.find{|r2| r2.orig_name == r.orig_name}.name } # find the new names
+	shorttags.each{|r| # find the new names
+		other = refs.find{|r2| r2.orig_name == r.orig_name}
+		raise 'shorttag with dangling name' if !other
+		r.name = other.name
+	}
 	refs += shorttags
 
 
