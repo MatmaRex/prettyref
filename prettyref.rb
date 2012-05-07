@@ -60,7 +60,7 @@ end
 # Represents a Wikipedia reference tag.
 class Ref
 	# Matches a HTML-like key=value attribute.
-	ATTR_RE = /(\w+) *= *("[^">\n]+"|'[^'>\n]+'|[^\s'"]+)/
+	ATTR_RE = /(\w+) *= *("[^">\n]+"|'[^'>\n]+'|[^\s'"\/]+)/
 	# Matches opening ref tag with its attributes as matching group.
 	REF_OPEN_RE = /< *ref((?: *#{ATTR_RE})*) *>/
 	# Matches closing ref tag.
@@ -270,7 +270,7 @@ def magical_ref_cleaning text
 	text = text.dup
 
 	# build list of refs
-	refs = text.scan(/(#{Ref::REF_OPEN_RE}(.+?)#{Ref::REF_CLOSE_RE})/).map{|ary| Ref.new ary.first}
+	refs = text.scan(/(#{Ref::REF_OPEN_RE}([\s\S]+?)#{Ref::REF_CLOSE_RE})/).map{|ary| Ref.new ary.first}
 
 	# check for name conflicts
 	all_names = refs.map{|r| r.name}.uniq
