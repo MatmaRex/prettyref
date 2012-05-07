@@ -1,12 +1,16 @@
 This is a tool to convert <ref>-style references to {{r}}-style ones.
 
-Related pl.wikipedia discussion: http://pl.wikipedia.org/wiki/Wikipedia:Kawiarenka/Artykuły#Uproszczenia_sk.C5.82adni_MediaWiki
+Related pl.wikipedia discussions:
+* http://pl.wikipedia.org/wiki/Wikipedia:Kawiarenka/Artykuły#Uproszczenia_sk.C5.82adni_MediaWiki
+* http://pl.wikipedia.org/wiki/Wikipedia:Kawiarenka/Propozycje#Techniczna_reforma_przypis.C3.B3w
 
 ----
 
 Narzędzie do konwersji przypisów typu <ref> na przypisy typu {{r}}.
 
-Powiązana dyskusja: http://pl.wikipedia.org/wiki/Wikipedia:Kawiarenka/Artykuły#Uproszczenia_sk.C5.82adni_MediaWiki
+Powiązane dyskusje: 
+* http://pl.wikipedia.org/wiki/Wikipedia:Kawiarenka/Artykuły#Uproszczenia_sk.C5.82adni_MediaWiki
+* http://pl.wikipedia.org/wiki/Wikipedia:Kawiarenka/Propozycje#Techniczna_reforma_przypis.C3.B3w
 
 ----
 
