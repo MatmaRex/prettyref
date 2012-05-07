@@ -75,6 +75,8 @@ class Ref
 	
 	attr_accessor :orig, :name, :orig_name, :group, :content
 	def initialize str, shorttag=false
+		@@group_ref_counter ||= Hash.new{|h,k| h[k] = 0}
+		
 		@orig = str.dup
 			
 		if !shorttag
@@ -127,7 +129,8 @@ class Ref
 				@name = v.dup
 				@orig_name = v.dup
 			when 'group'
-				raise 'ref groups unsupported'
+				@group = v.dup
+				@name = "#{@group}#{@@group_ref_counter[@group]+=1}"
 			end
 		}
 	end
@@ -319,7 +322,7 @@ def magical_ref_cleaning text
 	shorttags.each{|r| # find the new names
 		other = refs.find{|r2| r2.orig_name == r.orig_name}
 		raise 'shorttag with dangling name' if !other
-		r.name = other.name
+		r.name, r.group = other.name, other.group
 	}
 	refs += shorttags
 
@@ -327,16 +330,18 @@ def magical_ref_cleaning text
 	# replace refs in text with {{r}} calls
 	# this might also change the inside of references section - will deal with it later
 	refs.each do |r|
-		text.sub!(r.orig, "{{r|#{r.name}}}")
+		text.sub!(r.orig, "{{r|#{r.name}#{r.group ? "|grupa1=#{r.group}" : ''}}}")
 	end
-	nil while text.gsub!(/\{\{r\|([^}]+)\}\}\s*\{\{r\|([^}]+)\}\}/, '{{r|\1|\2}}') # clean up multiple consec. {{r}}
+	nil while text.gsub!(/\{\{r\|([^|}]+)\}\}\s*\{\{r\|([^|}]+)\}\}/, '{{r|\1|\2}}') # clean up multiple consec. {{r}}
 
 
 	# place refs in the section
-	przypisy_re = /(=+ *Przypisy *=+\s+)?(<references\s*\/>|\{\{Przypisy([^{}]*|\{\{[^{}]+\}\})+\}\}|<references\s*>(.+?)<\/references\s*>)/i
+	przypisy_re = /(=+ *(?:Przypisy|Uwagi) *=+\s+)?(<references[^\/]*\/>|\{\{(?:Przypisy|Uwagi)([^{}]*|\{\{[^{}]+\}\})+\}\}|<references[^\/]*>(.+?)<\/references\s*>)/i
 
 	if text =~ przypisy_re
 		old_ref_section = $&
+		
+		# figure out the heading level used for ref sections and probably thoughout the article
 		level = '=='
 		if mtc = old_ref_section.match(/\A==+/)
 			level = mtc.to_s
@@ -344,14 +349,37 @@ def magical_ref_cleaning text
 			level = mtc[1]
 		end
 		
-		data = (
-			["#{level} Przypisy #{level}", '{{Przypisy-lista|'] +
-			# skip shorttags
-			refs.select{|r| r.content}.sort_by{|r| UnicodeUtils.casefold r.name} +
-			['}}']
-		).join("\n")
+		group_name_to_heading = {
+			nil => 'Przypisy',
+			'uwaga' => 'Uwagi'
+		}
+		heading_order = %w[Uwagi Przypisy]
 		
-		text = text.sub(przypisy_re, data)
+		# get only refs with content (ie. not shorttags) and sort them
+		references = refs.select{|r| r.content}.sort_by{|r| UnicodeUtils.casefold r.name}
+		# then group them by their group info (that is, by headings they belong to), sort headings
+		references = references.group_by{|r| r.group}.sort_by{|k,v| heading_order.index group_name_to_heading[k]}
+		# churn out the wikicode for each section
+		sections = references.map{|group, refs|
+			(
+				["#{level} #{group_name_to_heading[group]} #{level}"] +
+				['{{Przypisy-lista|'+(group ? "grupa=#{group}|" : '')] +
+				refs +
+				['}}']
+			).join("\n")
+		}
+		
+		# insert new refs section(s) into page code
+		# remove all encountered sections, replace first one with ours
+		once = true
+		text = text.gsub(przypisy_re){
+			if once
+				once = false
+				sections.join "\n\n"
+			else
+				''
+			end
+		}
 	else
 		raise 'no refs section present?'
 	end
