@@ -116,15 +116,16 @@ class Ref
 	
 	def parse_attrs str
 		str.scan(ATTR_RE).each{|k, v|
+			v = v.strip
+			# strip quotes
+			if v[0] == v[-1] and (v[0]=="'" || v[0]=='"')
+				v = v[1..-2].strip
+			end
+			
 			case k
 			when 'name'
-				name = v.strip
-				# strip quotes
-				if name[0] == name[-1] and (name[0]=="'" || name[0]=='"')
-					name = name[1..-2].strip
-				end
-				@name = name
-				@orig_name = name.dup
+				@name = v.dup
+				@orig_name = v.dup
 			when 'group'
 				raise 'ref groups unsupported'
 			end
