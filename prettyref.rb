@@ -387,17 +387,19 @@ def magical_ref_cleaning text
 	return text
 end
 
-require 'sunflower'
-s = Sunflower.new.login
-#s.summary = ''
+if __FILE__ == $0
+	require 'sunflower'
+	s = Sunflower.new.login
+	#s.summary = ''
 
-list = readlines()
+	list = readlines()
 
 
-list.map{|a| a.strip}.each do |t|
-	next unless t and t!=''
+	list.map{|a| a.strip}.each do |t|
+		next unless t and t!=''
 
-	p = Page.new t
-	p.text = magical_ref_cleaning p.text
-	p.dump
+		p = Page.new t
+		p.text = magical_ref_cleaning p.text
+		p.dump
+	end
 end
