@@ -390,7 +390,7 @@ end
 if __FILE__ == $0
 	require 'sunflower'
 	s = Sunflower.new.login
-	#s.summary = ''
+	s.summary = 'konwersja przypisów'
 
 	list = readlines()
 
@@ -400,6 +400,6 @@ if __FILE__ == $0
 
 		p = Page.new t
 		p.text = magical_ref_cleaning p.text
-		p.dump
+		p.save
 	end
 end
