@@ -22,7 +22,7 @@
 function prettyref_run()
 {
 	importScriptURI(
-		location.protocol + "//prettyref.heroku.com/" + 
+		location.protocol+"//prettyref.heroku.com/" +
 		"?title="+encodeURIComponent(wgTitle) +
 		"&format=jsonp" +
 		"&callback=prettyref_callback" +
@@ -62,7 +62,7 @@ mw.loader.using("ext.gadget.lib-toolbar", function()
 		onclick: function()
 		{
 			var wpt = document.getElementById('wpTextbox1')
-			if($.trim(wpt.value) == $.trim(wpt.defaultValue) || confirm("Zmiany wprowadzone w tekście zostaną utracone. Kontynuować?")) prettyref_run();
+			if($.trim(wpt.value) == $.trim(wpt.defaultValue) || confirm("Zmiany wprowadzone w tekście zostaną utracone. Kontynuować?")) prettyref_run()
 		}
 	})
 })
