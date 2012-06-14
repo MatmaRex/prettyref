@@ -68,17 +68,18 @@ module Web::Controllers
 
 			output = ([e.to_s]+e.backtrace).join("\n")
 			output_struct = {status: 500, error: e.to_s, backtrace: output }
-			
-			@status = 500
 
 			case format
 			when 'json'
+				@status = 200
 				@headers = {"Content-Type" => "application/json"}
 				return output_struct.to_json
 			when 'jsonp'
+				@status = 200
 				@headers = {"Content-Type" => "text/javascript"}
 				return "#{callback}(#{output_struct.to_json})"
 			else
+				@status = 500
 				@headers = {"Content-Type" => "text/plain"}
 				return output
 			end
