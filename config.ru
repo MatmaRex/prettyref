@@ -31,7 +31,7 @@ module Web::Controllers
 						<body>
 							<form method=post action=/ onsubmit="if(this.text.value=='') this.method='get'; else this.method='post' ">
 								Title: <input name=title> <br>
-								Or – text: <textarea name=text rows=1 style="overflow-y:scroll"></textarea> <br>
+								Or â€“ text: <textarea name=text rows=1 style="overflow-y:scroll"></textarea> <br>
 								<br>
 								Format: <select name=format><option>plain<option>json<option>jsonp</select> <input type=submit>
 							</form>
