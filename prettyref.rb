@@ -272,6 +272,7 @@ end
 # Does all the hard work.
 def magical_ref_cleaning text
 	text = text.dup
+	text.gsub! '<!-- Tytuł wygenerowany przez bota -->', '' # these notices are 100% unnecessary
 
 	# build list of refs
 	refs = text.scan(/(#{Ref::REF_OPEN_RE}([^<>]+)#{Ref::REF_CLOSE_RE})/).map{|ary| Ref.new ary.first}
