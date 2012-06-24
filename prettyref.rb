@@ -65,8 +65,8 @@ class Ref
 	REF_OPEN_RE = /< *ref((?: *#{ATTR_RE})*) *>/
 	# Matches closing ref tag.
 	REF_CLOSE_RE = /< *\/ *ref *>/
-	# Matches self-closing ref tag (shorttag).
-	REF_SHORTTAG = /< *ref((?: *#{ATTR_RE})*) *\/ *>/
+	# Matches self-closing ref tag (shorttag), or a regular tag with no content.
+	REF_SHORTTAG = /< *ref((?: *#{ATTR_RE})*) *(?:\/ *>|>#{REF_CLOSE_RE})/
 	# Matches {{r}} template.
 	REF_RETAG = /\{\{\s*[rR]\s*((?:\|[^\|\}]*)+)\}\}/
 	
