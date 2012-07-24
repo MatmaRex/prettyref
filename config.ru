@@ -14,6 +14,9 @@ Camping.goes :Web
 module Web::Controllers
 	class Index
 		def get
+			@headers ||= {}
+			@headers.merge! 'Access-Control-Allow-Origin' => '*'
+			
 			title = (@request["title"] && @request["title"].strip != '') ? @request["title"].strip : nil
 			text = (@request["text"] && @request["text"].strip != '') ? @request["text"] : nil
 			format = (@request["format"] && @request["format"].strip != '') ? @request["format"].strip : 'plain'
@@ -41,7 +44,8 @@ module Web::Controllers
 					</html>
 				EOF
 				
-				@status, @headers = 400, {"Content-Type" => "text/html"}
+				@status = 400
+				@headers.merge! "Content-Type" => "text/html"
 				return form
 			else
 				text = Page.new(title).text if !text
@@ -52,13 +56,13 @@ module Web::Controllers
 				
 				case format
 				when 'json'
-					@headers = {"Content-Type" => "application/json"}
+					@headers.merge! "Content-Type" => "application/json"
 					return output_struct.to_json
 				when 'jsonp'
-					@headers = {"Content-Type" => "text/javascript"}
+					@headers.merge! "Content-Type" => "text/javascript"
 					return "#{callback}(#{output_struct.to_json})"
 				else
-					@headers = {"Content-Type" => "text/plain"}
+					@headers.merge! "Content-Type" => "text/plain"
 					return output
 				end
 			end
@@ -73,15 +77,15 @@ module Web::Controllers
 			case format
 			when 'json'
 				@status = 200
-				@headers = {"Content-Type" => "application/json"}
+				@headers.merge! "Content-Type" => "application/json"
 				return output_struct.to_json
 			when 'jsonp'
 				@status = 200
-				@headers = {"Content-Type" => "text/javascript"}
+				@headers.merge! "Content-Type" => "text/javascript"
 				return "#{callback}(#{output_struct.to_json})"
 			else
 				@status = 500
-				@headers = {"Content-Type" => "text/plain"}
+				@headers.merge! "Content-Type" => "text/plain"
 				return output
 			end
 		end
