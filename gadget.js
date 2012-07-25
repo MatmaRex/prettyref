@@ -13,20 +13,24 @@
 // do swojego common.js. 
 // 
 // W pasku narzędzi pojawi się nowy przycisk ze słowem "ref".
-// Kliknij, aby dokonała się magia. Zmiany dokonane w tekście strony
-// przed kliknięciem przycisku zostaną utracone.
+// Kliknij, aby dokonała się magia.
 //
 // Autor: Matma Rex, CC-BY-SA 3.0.
 
 
 function prettyref_run()
 {
-	importScriptURI(
-		location.protocol+"//prettyref.heroku.com/" +
-		"?title="+encodeURIComponent(wgTitle) +
-		"&format=jsonp" +
-		"&callback=prettyref_callback" +
-		"&rand="+Math.random()
+	$.ajax(
+		{
+			url: location.protocol+"//prettyref.heroku.com/",
+			type: 'POST',
+			cache: false,
+			data: {
+				text: document.getElementById('wpTextbox1').value,
+				format: 'json'
+			},
+			success: prettyref_callback
+		}
 	)
 }
 
@@ -61,8 +65,7 @@ mw.loader.using("ext.gadget.lib-toolbar", function()
 		icon: '//upload.wikimedia.org/wikipedia/commons/2/2b/Button_ref_inscription.png',
 		onclick: function()
 		{
-			var wpt = document.getElementById('wpTextbox1')
-			if($.trim(wpt.value) == $.trim(wpt.defaultValue) || confirm("Zmiany wprowadzone w tekście zostaną utracone. Kontynuować?")) prettyref_run()
+			prettyref_run()
 		}
 	})
 })
