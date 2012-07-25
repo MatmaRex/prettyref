@@ -20,6 +20,8 @@
 
 function prettyref_run()
 {
+	$('#mw-editbutton-prettyref').attr('src', '//upload.wikimedia.org/wikipedia/commons/4/42/Loading.gif')
+	
 	$.ajax(
 		{
 			url: location.protocol+"//prettyref.heroku.com/",
@@ -55,6 +57,8 @@ function prettyref_callback(json)
 		
 		alert("OK. Przed zapisaniem sprawdź wykonane zmiany!")
 	}
+	
+	$('#mw-editbutton-prettyref').attr('src', '//upload.wikimedia.org/wikipedia/commons/2/2b/Button_ref_inscription.png')
 }
 
 mw.loader.using("ext.gadget.lib-toolbar", function()
@@ -62,6 +66,7 @@ mw.loader.using("ext.gadget.lib-toolbar", function()
 	toolbarGadget.addButton({
 		title: 'Przenieś refy na koniec',
 		alt: '{{r',
+		id: 'mw-editbutton-prettyref',
 		icon: '//upload.wikimedia.org/wikipedia/commons/2/2b/Button_ref_inscription.png',
 		onclick: function()
 		{
