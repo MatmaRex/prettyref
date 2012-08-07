@@ -85,7 +85,7 @@ class Ref
 			
 			@content = str.strip
 			
-			if !@name || @name=='test' || @name =~ /^auto(nazwa)?\d+$/
+			if !@name || @name =~ /^(auto|autonazwa|test)\d*$/
 				@name = extract_name @content.dup
 			end
 		else
