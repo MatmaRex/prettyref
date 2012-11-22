@@ -38,7 +38,7 @@ class Template < Hash
 			data = data.strip.sub(/\A[ \t]+/, '')
 			data = data.gsub(/<<<#>>>/, '|').gsub(/<<<#(#+)>>>/, '<<<\1>>>') # unescape
 			
-			self[name.strip] = data
+			self[name.strip] = data unless data.empty?
 		end
 	end
 	
