@@ -240,7 +240,7 @@ class Ref
 		path = (uri_p.path||'') + '?' + (uri_p.query||'')
 		path = (CGI.unescape(path) rescue path)
 		
-		words = path.scan(/[\w\d_-]{4,}/).reject{|a| %w[cgi-bin html shtml].include?(a) || a=~/_id$/}
+		words = path.scan(/[\w\d_-]{4,}/).reject{|a| %w[cgi-bin html shtml jhtml].include?(a) || a=~/_id$/}
 		words = words.map{|w| w.gsub('_','-').gsub(/-+/,'-').gsub(/^-|-$/, '') }
 		
 		ident = ([host.gsub('.', '-')] + words).join('-')
