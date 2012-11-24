@@ -225,6 +225,8 @@ class Ref
 	end
 	
 	def extract_name_from_uri uri
+		uri = uri.sub %r~https?://web.archive.org/web/(\*|\d+)/~, ''
+		
 		uri_p = URI.parse uri
 		
 		tld = %w[biz com info name net org pro aero asia cat coop edu gov int jobs mil mobi museum tel travel xxx co]
