@@ -341,7 +341,9 @@ def magical_ref_cleaning text
 		other = refs.find{|r2| r2.orig_name == r.orig_name}
 		raise 'shorttag with dangling name' if !other
 		r.name = other.name
-		r.group ||= other.group # group need not be set if the ref was inside <references/>
+		# group need not be set if the ref was inside <references/>
+		# if it's set on any, copy it
+		r.group = other.group = (r.group || other.group)
 	}
 	refs += shorttags
 
