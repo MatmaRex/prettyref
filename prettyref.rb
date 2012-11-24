@@ -67,8 +67,10 @@ class Ref
 	REF_CLOSE_RE = /< *\/ *ref *>/
 	# Matches self-closing ref tag (shorttag), or a regular tag with no content.
 	REF_SHORTTAG = /< *ref((?: *#{ATTR_RE})*) *(?:\/ *>|>#{REF_CLOSE_RE})/
-	# Matches {{r}} template.
-	REF_RETAG = /\{\{\s*[rR]\s*((?:\|[^\|\}]*)+)\}\}/
+	# Matches {{r}} or {{u}} template.
+	REF_RETAG = /\{\{\s*[rRuU]\s*((?:\|[^\|\}]*)+)\}\}/
+	REF_RETAG_U = /\{\{\s*[uU]\s*((?:\|[^\|\}]*)+)\}\}/
+	REF_RETAG_R = /\{\{\s*[rR]\s*((?:\|[^\|\}]*)+)\}\}/
 	
 	# Optimal length for ref name. Does not apply in some cases.
 	IDENT_MAX_LEN = 25
@@ -94,7 +96,9 @@ class Ref
 			if str =~ REF_SHORTTAG
 				str.sub!(REF_SHORTTAG){ parse_attrs $1; '' }
 			elsif str =~ REF_RETAG
+				@group = 'uwaga' if str =~ REF_RETAG_U
 				data = str[REF_RETAG, 1].split(/\s*\|\s*/).map(&:strip).select{|a| a and a!=''}
+				
 				if data.any?{|a| a.include? '='}
 					raise '{{r}} tags with named attributes unsupported'
 				end
@@ -255,6 +259,16 @@ class Ref
 		ident
 	end
 	
+	def to_shorttag
+		if !@group
+			"{{r|#{@name}}}"
+		elsif @group == 'uwaga'
+			"{{u|#{@name}}}"
+		else
+			"{{r|#{@name}|grupa1=#{@group}}}"
+		end
+	end
+	
 	def to_s
 		if @content
 			fmt = '<ref name="%s">%s</ref>'
@@ -319,14 +333,15 @@ def magical_ref_cleaning text
 	end
 	
 	# add the shorttags
-	text.gsub!(Ref::REF_RETAG){ $&.gsub('|', '}}{{r|').gsub('{{r}}', '') } # HACK make multi-{{r}} sort-of work
+	text.gsub!(Ref::REF_RETAG_R){ $&.gsub('|', '}}{{r|').gsub('{{r}}', '') } # HACK make multi-{{r}} sort-of work
 	
 	shorttags = text.scan(/(#{Ref::REF_SHORTTAG})/).map{|ary| Ref.new ary.first, true}
 	shorttags += text.scan(/(#{Ref::REF_RETAG})/).map{|ary| Ref.new ary.first, true}
 	shorttags.each{|r| # find the new names
 		other = refs.find{|r2| r2.orig_name == r.orig_name}
 		raise 'shorttag with dangling name' if !other
-		r.name, r.group = other.name, other.group
+		r.name = other.name
+		r.group ||= other.group # group need not be set if the ref was inside <references/>
 	}
 	refs += shorttags
 
@@ -334,7 +349,7 @@ def magical_ref_cleaning text
 	# replace refs in text with {{r}} calls
 	# this might also change the inside of references section - will deal with it later
 	refs.each do |r|
-		text.sub!(r.orig, "{{r|#{r.name}#{r.group ? "|grupa1=#{r.group}" : ''}}}")
+		text.sub!(r.orig, r.to_shorttag)
 	end
 	nil while text.gsub!(/\{\{r\|([^|}]+)\}\}\s*\{\{r\|([^|}]+)\}\}/, '{{r|\1|\2}}') # clean up multiple consec. {{r}}
 
