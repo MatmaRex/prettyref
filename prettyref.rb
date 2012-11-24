@@ -232,6 +232,7 @@ class Ref
 		
 		host = uri_p.host.sub(/^www?\d*\./, '').sub(/\.(#{cctld.join('|')})$/, '').sub(/\.(#{tld.join('|')})$/, '')
 		path = (uri_p.path||'') + '?' + (uri_p.query||'')
+		path = (CGI.unescape(path) rescue path)
 		
 		words = path.scan(/[\w\d_-]{4,}/).reject{|a| %w[cgi-bin html].include?(a) || a=~/_id$/}
 		words = words.map{|w| w.gsub('_','-').gsub(/-+/,'-').gsub(/^-|-$/, '') }
