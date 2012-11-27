@@ -1,6 +1,7 @@
 # coding: utf-8
 require 'uri'
 require 'unicode_utils'
+require 'sunflower'
 
 # Represents a Wikipedia template. (Simplified parsing, beware.)
 class Template < Hash
@@ -22,7 +23,7 @@ class Template < Hash
 	def parse text
 		# TODO don't require default Sunflower settings to just work
 		text.strip!
-		text.sub!(/\A{{\s*([^\|]+)/){ @name = Sunflower.new.cleanup_title $1.strip; '' }
+		text.sub!(/\A{{\s*([^\|]+)/){ @name = Sunflower.new('w:pl').cleanup_title $1.strip; '' }
 		text.sub!(/\}\}\Z/, '')
 		
 		# escape pipes in inner templates and links
@@ -430,8 +431,7 @@ def magical_ref_cleaning text
 end
 
 if __FILE__ == $0
-	require 'sunflower'
-	s = Sunflower.new.login
+	s = Sunflower.new('w:pl').login
 	s.summary = 'konwersja przypisów'
 
 	list = readlines()
