@@ -160,7 +160,7 @@ class Ref
 		# Jeśli nie uda się utworzyć identyfikatora na żaden z powyższych sposobów, powstaje on z początkowych słów 
 		# występujących w tekście refa.
 		
-		if str.start_with? '{{'
+		if str.start_with? '{{' and str.end_with? '}}'
 			# jeśli mamy szablon, to super
 			tpl = Template.new str
 			
@@ -282,7 +282,7 @@ class Ref
 		if @content
 			fmt = '<ref name="%s">%s</ref>'
 			
-			if @content.start_with?('{{')
+			if @content.start_with? '{{' and @content.end_with? '}}'
 				tpl = Template.new(@content.dup)
 				
 				# keep this switch synced with the one in #extract_name
