@@ -20,8 +20,9 @@ class Template < Hash
 	end
 	
 	def parse text
+		# TODO don't require default Sunflower settings to just work
 		text.strip!
-		text.sub!(/\A{{\s*([^\|]+)/){ @name = $1.strip; @name[0] = @name[0].upcase; '' }
+		text.sub!(/\A{{\s*([^\|]+)/){ @name = Sunflower.new.cleanup_title $1.strip; '' }
 		text.sub!(/\}\}\Z/, '')
 		
 		# escape pipes in inner templates and links
