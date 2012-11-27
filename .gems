@@ -1,4 +1,4 @@
-sunflower
+sunflower >= 0.5.5
 rack
 camping
 json
