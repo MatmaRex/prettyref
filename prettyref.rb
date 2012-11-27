@@ -420,7 +420,7 @@ if __FILE__ == $0
 	list.map{|a| a.strip}.each do |t|
 		next unless t and t!=''
 
-		p = Page.new t
+		p = s.page t
 		p.text = magical_ref_cleaning p.text
 		p.save
 	end
