@@ -211,6 +211,8 @@ class Ref
 				# take the short name and numbers
 				map = {'Dziennik Ustaw' => 'DzU', 'Monitor Polski' => 'MP'}
 				ident = map[tpl.name] + ' ' + str.scan(/\d+/).join('-')
+			when 'Ludzie nauki'
+				ident = "ludzie-nauki-#{ str[/\d+/] }"
 			else
 				raise "unsupported cite template #{tpl.name}"
 			end
@@ -294,6 +296,9 @@ class Ref
 						raise "unsupported template syntax: #{@content}"
 						# cont = @content.gsub(/\s*/, '').sub(/{{#{tpl.name.gsub(/\s*/, '')}/, "{{#{tpl.name}")
 					end
+				when 'Ludzie nauki'
+					# TODO parsing
+					cont = @content
 				else
 					raise "invalid template #{tpl.name}"
 				end
