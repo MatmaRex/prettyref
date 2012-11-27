@@ -210,7 +210,7 @@ class Ref
 			when 'Dziennik Ustaw', 'Monitor Polski'
 				# take the short name and numbers
 				map = {'Dziennik Ustaw' => 'DzU', 'Monitor Polski' => 'MP'}
-				ident = map[tpl.name] + str.scan(/\d+/).join('')
+				ident = map[tpl.name] + ' ' + str.scan(/\d+/).join('-')
 			else
 				raise "unsupported cite template #{tpl.name}"
 			end
