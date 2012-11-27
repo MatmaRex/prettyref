@@ -6,7 +6,7 @@ require 'unicode_utils'
 class Template < Hash
 	LOWERCASE_CAPITALISATION = ['Cytuj grę komputerową', 'Cytuj książkę', 'Cytuj odcinek', 'Cytuj pismo', 'Cytuj stronę']
 	
-	attr_accessor :name
+	attr_accessor :name, :fully_valid
 	def initialize str
 		super()
 		parse str
@@ -38,6 +38,9 @@ class Template < Hash
 			
 			self[name.strip] = data unless data.empty?
 		end
+		
+		leftovers = text.gsub(/\|\s*(.+?)\s*=([\s\S]*?)(?=\||\Z)/, '')
+		@fully_valid = !!(leftovers.strip.empty?)
 	end
 	
 	
