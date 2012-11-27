@@ -4,10 +4,7 @@ require 'unicode_utils'
 
 # Represents a Wikipedia template. (Simplified parsing, beware.)
 class Template < Hash
-	CANONICAL_CAPITALISATION = {
-		lowercase: ['Cytuj grę komputerową', 'Cytuj książkę', 'Cytuj odcinek', 'Cytuj pismo', 'Cytuj stronę'],
-		uppercase: ['GoldBook'],
-	}
+	LOWERCASE_CAPITALISATION = ['Cytuj grę komputerową', 'Cytuj książkę', 'Cytuj odcinek', 'Cytuj pismo', 'Cytuj stronę']
 	
 	attr_accessor :name
 	def initialize str
@@ -47,7 +44,7 @@ class Template < Hash
 		data = []
 		name = @name.dup
 		# by default names are stored uppercased
-		name[0] = name[0].downcase if CANONICAL_CAPITALISATION[:lowercase].include? name
+		name[0] = name[0].downcase if LOWERCASE_CAPITALISATION.include? name
 		data << "{{#{name}"
 		
 		data += self.map{|param, value| " | #{param} = #{value}" }
