@@ -163,6 +163,7 @@ class Ref
 			# jeśli mamy szablon, to super
 			tpl = Template.new str
 			
+			# keep this switch synced with the one in #to_s
 			case tpl.name
 			when 'Cytuj grę komputerową', 'Cytuj książkę', 'Cytuj odcinek', 'Cytuj pismo', 'Cytuj stronę'
 				# extract some terms used later
@@ -205,6 +206,10 @@ class Ref
 					# nic sie nie dopasowalo? dziwne...
 					ident = extract_name_from_words clear_wikitext tpl.values.join(" ")
 				end
+			when 'Dziennik Ustaw', 'Monitor Polski'
+				# take the short name and numbers
+				map = {'Dziennik Ustaw' => 'DzU', 'Monitor Polski' => 'MP'}
+				ident = map[tpl.name] + str.scan(/\d+/).join('')
 			else
 				raise "unsupported cite template #{tpl.name}"
 			end
@@ -274,8 +279,23 @@ class Ref
 		if @content
 			fmt = '<ref name="%s">%s</ref>'
 			
-			if @content.start_with? '{{'
-				cont = Template.new(@content.dup).to_s
+			if @content.start_with?('{{')
+				tpl = Template.new(@content.dup)
+				
+				# keep this switch synced with the one in #extract_name
+				case tpl.name
+				when 'Cytuj grę komputerową', 'Cytuj książkę', 'Cytuj odcinek', 'Cytuj pismo', 'Cytuj stronę'
+					cont = tpl.to_s
+				when 'Dziennik Ustaw', 'Monitor Polski'
+					if tpl.fully_valid
+						cont = tpl.to_s
+					else
+						raise "unsupported template syntax: #{@content}"
+						# cont = @content.gsub(/\s*/, '').sub(/{{#{tpl.name.gsub(/\s*/, '')}/, "{{#{tpl.name}")
+					end
+				else
+					raise "invalid template #{tpl.name}"
+				end
 			else
 				cont = @content
 			end
