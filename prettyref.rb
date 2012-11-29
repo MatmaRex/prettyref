@@ -141,6 +141,11 @@ class Ref
 		}
 	end
 	
+	def str_one_template_call? str
+		str.start_with? '{{' and str.end_with? '}}' and str.scan(/{{/).length==1 and str.scan(/}}/).length==1
+	end
+	private :str_one_template_call?
+	
 	def extract_name str
 		# Nazwę dla refa możemy wymyślić na kilka sposobów. Nie powinna ona przekraczać 25 (IDENT_MAX_LEN) znaków. 
 		# W kolejności używamy do tego:
@@ -160,7 +165,7 @@ class Ref
 		# Jeśli nie uda się utworzyć identyfikatora na żaden z powyższych sposobów, powstaje on z początkowych słów 
 		# występujących w tekście refa.
 		
-		if str.start_with? '{{' and str.end_with? '}}'
+		if str_one_template_call? str
 			# jeśli mamy szablon, to super
 			tpl = Template.new str
 			
@@ -282,7 +287,7 @@ class Ref
 		if @content
 			fmt = '<ref name="%s">%s</ref>'
 			
-			if @content.start_with? '{{' and @content.end_with? '}}'
+			if str_one_template_call? @content
 				tpl = Template.new(@content.dup)
 				
 				# keep this switch synced with the one in #extract_name
