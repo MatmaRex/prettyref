@@ -321,7 +321,9 @@ end
 # Does all the hard work.
 def magical_ref_cleaning text
 	text = text.dup
+	
 	text.gsub! '<!-- Tytuł wygenerowany przez bota -->', '' # these notices are 100% unnecessary
+	text.gsub!(/{{(cytuj [^{}]+?)}}\s*{{lang\|([a-z-]+)}}/i, '{{\1 | język = \2}}') # merge {{lang}} inside cite templates
 
 	# build list of refs
 	refs = text.scan(/(#{Ref::REF_OPEN_RE}([\s\S]+?)#{Ref::REF_CLOSE_RE})/).map{|ary| Ref.new ary.first}
