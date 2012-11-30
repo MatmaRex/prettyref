@@ -62,7 +62,7 @@ end
 # Represents a Wikipedia reference tag.
 class Ref
 	# Matches a HTML-like key=value attribute.
-	ATTR_RE = /(\w+) *= *("[^">\n]+"|'[^'>\n]+'|[^\s'"\/]+)/
+	ATTR_RE = /(\w+) *= *("[^">\n]+"|'[^'>\n]+'|[^\s'"<>\/]+)/
 	# Matches opening ref tag with its attributes as matching group.
 	REF_OPEN_RE = /< *ref((?: *#{ATTR_RE})*) *>/
 	# Matches closing ref tag.
