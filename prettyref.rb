@@ -404,6 +404,14 @@ def magical_ref_cleaning text
 			level = mtc[1]
 		end
 		
+		# figure out the column count
+		cols = 1
+		if mtc = old_ref_section.match(/\|\s*(\d+)\s*(\||}})/)
+			cols = mtc[1].to_i
+		elsif mtc = old_ref_section.match(/l\. *kolumn\s*=\s*(\d+)/)
+			cols = mtc[1].to_i
+		end
+		
 		group_name_to_heading = {
 			nil => 'Przypisy',
 			'uwaga' => 'Uwagi'
@@ -418,7 +426,7 @@ def magical_ref_cleaning text
 		sections = references.map{|group, refs|
 			(
 				["#{level} #{group_name_to_heading[group]} #{level}"] +
-				['{{Przypisy-lista|'+(group ? "grupa=#{group}|" : '')] +
+				['{{Przypisy-lista|' + (group ? "grupa=#{group}|" : '') + (cols>1 ? "l. kolumn=#{cols}|" : '')] +
 				refs +
 				['}}']
 			).join("\n")
