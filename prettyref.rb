@@ -269,7 +269,7 @@ class Ref
 	
 	def extract_name_from_words str
 		words = (UnicodeUtils.nfc str).scan(/(?:\p{L}|\p{M}|\p{N})+/)
-		ident = words.inject(''){|id, w| id.length<IDENT_MAX_LEN ? (id<<' '<<w) : id }
+		ident = words.inject(''){|id, w| id.length<IDENT_MAX_LEN ? (id+' '+w) : id }
 		ident
 	end
 	
