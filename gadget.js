@@ -5,7 +5,7 @@
 // Wykorzystuje w tym celu skrypt prettyref i interfejs WWW do niego.
 // 
 // Źródła:    https://github.com/MatmaRex/prettyref
-// Interfejs: https://prettyref.heroku.com/
+// Interfejs: https://prettyref.herokuapp.com/
 // 
 // 
 // Użycie: dodaj
@@ -24,7 +24,7 @@ function prettyref_run()
 	
 	$.ajax(
 		{
-			url: location.protocol+"//prettyref.heroku.com/",
+			url: location.protocol+"//prettyref.herokuapp.com/",
 			type: 'POST',
 			cache: false,
 			data: {
